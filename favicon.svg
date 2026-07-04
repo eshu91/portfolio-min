@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- ISHWARI RAUT — Cyberpunk Void favicon
+       #020014 void · #00FFF7 cyan · #FF10F0 magenta · #B026FF purple · #FFB627 amber -->
+  <defs>
+    <radialGradient id="nebula" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#B026FF" stop-opacity=".35"/>
+      <stop offset="100%" stop-color="#B026FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="planet" cx="42%" cy="38%" r="70%">
+      <stop offset="0%"  stop-color="#0a0140"/>
+      <stop offset="72%" stop-color="#060228"/>
+      <stop offset="100%" stop-color="#00FFF7"/>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <!-- void background, rounded -->
+  <rect width="1024" height="1024" rx="225" fill="#020014"/>
+  <circle cx="512" cy="522" r="330" fill="url(#nebula)"/>
+
+  <!-- background stars -->
+  <circle cx="150" cy="190" r="10" fill="#ffffff"/>
+  <circle cx="860" cy="150" r="8"  fill="#00FFF7"/>
+  <circle cx="200" cy="840" r="8"  fill="#B026FF"/>
+  <circle cx="870" cy="800" r="7"  fill="#ffffff"/>
+  <circle cx="520" cy="110" r="7"  fill="#FF10F0"/>
+
+  <!-- amber 4-point star -->
+  <path fill="#FFB627" d="M800 194 L816 244 L866 260 L816 276 L800 326 L784 276 L734 260 L784 244 Z"/>
+
+  <!-- ring glow -->
+  <g transform="rotate(-18 512 522)" filter="url(#soft)" opacity=".7">
+    <ellipse cx="512" cy="522" rx="340" ry="120" fill="none" stroke="#FF10F0" stroke-width="34"/>
+  </g>
+
+  <!-- ring back half (behind planet) -->
+  <g transform="rotate(-18 512 522)">
+    <path d="M172 522 A340 120 0 0 1 852 522" fill="none" stroke="#FF10F0" stroke-width="34"/>
+  </g>
+
+  <!-- planet -->
+  <circle cx="512" cy="522" r="250" fill="url(#planet)"/>
+  <circle cx="512" cy="522" r="250" fill="none" stroke="#00FFF7" stroke-width="20"/>
+  <circle cx="512" cy="522" r="250" fill="none" stroke="#00FFF7" stroke-width="52" opacity=".35"/>
+  <!-- latitude wires -->
+  <path d="M362 420 A190 62 0 0 0 662 420" fill="none" stroke="#00FFF7" stroke-width="12" opacity=".7"/>
+  <path d="M300 522 A230 70 0 0 0 724 522" fill="none" stroke="#00FFF7" stroke-width="12" opacity=".7"/>
+  <path d="M362 624 A190 62 0 0 0 662 624" fill="none" stroke="#00FFF7" stroke-width="12" opacity=".7"/>
+
+  <!-- ring front half (in front of planet) -->
+  <g transform="rotate(-18 512 522)">
+    <path d="M172 522 A340 120 0 0 0 852 522" fill="none" stroke="#FF10F0" stroke-width="34"/>
+  </g>
+</svg>
