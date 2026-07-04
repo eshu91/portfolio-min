@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ishwari Raut ⚡ Cloud · Flutter · AI</title>
+<meta name="description" content="Ishwari Raut — Cloud Explorer, Flutter Builder, AI Automation Architect. Portfolio."/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   CYBERPUNK VOID — design tokens (matches eshu91 README palette)
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --void:      #020014;
+  --panel:     #0a0118;
+  --panel-2:   #100226;
+  --cyan:      #00FFF7;
+  --magenta:   #FF10F0;
+  --purple:    #B026FF;
+  --amber:     #FFB627;
+  --text:      #EAE7FA;
+  --muted:     #9d95c9;
+  --line:      rgba(176,38,255,.25);
+  --font-display:'Michroma', sans-serif;
+  --font-body:  'Space Grotesk', sans-serif;
+  --font-mono:  'JetBrains Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--void);
+  color:var(--text);
+  font-family:var(--font-body);
+  overflow-x:hidden;
+  line-height:1.6;
+}
+::selection{background:var(--magenta);color:var(--void)}
+a{color:var(--cyan);text-decoration:none}
+
+/* ── 3D canvas ─────────────────────────────────────────────── */
+#cosmos{
+  position:fixed;inset:0;z-index:0;display:block;
+}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0%,transparent 0%,rgba(2,0,20,.55) 75%);}
+
+/* ── boot loader ───────────────────────────────────────────── */
+#boot{
+  position:fixed;inset:0;z-index:100;background:var(--void);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:22px;transition:opacity .6s ease, visibility .6s;
+}
+#boot.done{opacity:0;visibility:hidden}
+#boot .sig{font-family:var(--font-mono);font-size:13px;color:var(--cyan);letter-spacing:.25em}
+#boot .bar{width:min(320px,70vw);height:2px;background:rgba(0,255,247,.12);overflow:hidden}
+#boot .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--magenta));animation:load 1.4s ease forwards}
+@keyframes load{to{width:100%}}
+
+/* ── nav ───────────────────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px clamp(20px,5vw,56px);
+  background:rgba(2,0,20,.55);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.logo{font-family:var(--font-display);font-size:15px;letter-spacing:.14em;color:var(--text)}
+.logo b{color:var(--cyan);font-weight:400}
+.nav-links{display:flex;gap:clamp(14px,2.5vw,32px)}
+.nav-links a{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;
+  color:var(--muted);text-transform:uppercase;transition:color .25s;
+}
+.nav-links a:hover,.nav-links a:focus-visible{color:var(--cyan)}
+.nav-links a:focus-visible{outline:1px solid var(--cyan);outline-offset:4px}
+@media(max-width:640px){.nav-links a:nth-child(n+5){display:none}}
+
+/* ── shared section shell ─────────────────────────────────── */
+main{position:relative;z-index:2}
+section{padding:clamp(80px,12vh,140px) clamp(20px,6vw,80px);max-width:1200px;margin:0 auto}
+.eyebrow{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.35em;
+  color:var(--magenta);text-transform:uppercase;margin-bottom:14px;
+}
+.eyebrow::before{content:"▸ ";color:var(--cyan)}
+h2{
+  font-family:var(--font-display);font-weight:400;
+  font-size:clamp(22px,3.6vw,38px);letter-spacing:.06em;
+  margin-bottom:clamp(28px,4vw,48px);
+}
+h2 .glow{color:var(--cyan);text-shadow:0 0 24px rgba(0,255,247,.5)}
+
+/* reveal on scroll */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ── hero ─────────────────────────────────────────────────── */
+#hero{
+  min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+  max-width:1200px;padding-top:120px;
+}
+.hero-tag{font-family:var(--font-mono);font-size:13px;color:var(--amber);letter-spacing:.2em;margin-bottom:18px}
+.hero-tag::before{content:"⚡ "}
+h1{
+  font-family:var(--font-display);font-weight:400;
+  font-size:clamp(34px,7vw,76px);line-height:1.12;letter-spacing:.03em;
+}
+h1 .n1{color:var(--text)}
+h1 .n2{
+  background:linear-gradient(92deg,var(--cyan) 0%,var(--purple) 55%,var(--magenta) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero-roles{
+  margin-top:22px;font-family:var(--font-mono);
+  font-size:clamp(13px,1.6vw,16px);color:var(--muted);min-height:1.6em;
+}
+.hero-roles .cursor{color:var(--cyan);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hero-cta{display:flex;gap:16px;margin-top:40px;flex-wrap:wrap}
+.btn{
+  font-family:var(--font-mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  padding:14px 26px;border:1px solid var(--cyan);color:var(--cyan);
+  background:rgba(0,255,247,.04);transition:all .25s;cursor:pointer;
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+}
+.btn:hover,.btn:focus-visible{background:var(--cyan);color:var(--void);box-shadow:0 0 32px rgba(0,255,247,.45)}
+.btn.alt{border-color:var(--magenta);color:var(--magenta);background:rgba(255,16,240,.04)}
+.btn.alt:hover,.btn.alt:focus-visible{background:var(--magenta);color:var(--void);box-shadow:0 0 32px rgba(255,16,240,.45)}
+.scroll-hint{
+  margin-top:70px;font-family:var(--font-mono);font-size:11px;color:var(--muted);
+  letter-spacing:.3em;display:flex;align-items:center;gap:12px;
+}
+.scroll-hint i{display:block;width:1px;height:44px;background:linear-gradient(var(--cyan),transparent);animation:drop 1.8s ease infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ── mission control stats ────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}
+.stat{
+  border:1px solid var(--line);background:rgba(10,1,24,.72);backdrop-filter:blur(8px);
+  padding:26px 22px;position:relative;overflow:hidden;
+}
+.stat::before{content:"";position:absolute;top:0;left:0;width:100%;height:2px;
+  background:linear-gradient(90deg,var(--stat-c,var(--cyan)),transparent)}
+.stat .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.24em;color:var(--muted);text-transform:uppercase}
+.stat .v{font-family:var(--font-display);font-size:clamp(17px,2vw,22px);margin-top:10px;color:var(--stat-c,var(--cyan))}
+.stat .d{font-size:13px;color:var(--muted);margin-top:8px}
+
+/* ── about terminal ───────────────────────────────────────── */
+.terminal{
+  border:1px solid var(--line);background:rgba(10,1,24,.82);backdrop-filter:blur(8px);
+  font-family:var(--font-mono);font-size:clamp(12px,1.4vw,14px);
+  box-shadow:0 0 60px rgba(176,38,255,.12);
+}
+.term-bar{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:center}
+.term-bar span{width:10px;height:10px;border-radius:50%}
+.term-bar .r{background:var(--magenta)}.term-bar .y{background:var(--amber)}.term-bar .g{background:var(--cyan)}
+.term-bar .t{margin-left:12px;font-size:11px;color:var(--muted);letter-spacing:.15em}
+.term-body{padding:22px clamp(16px,3vw,30px);overflow-x:auto;white-space:pre;line-height:1.75;color:var(--muted)}
+.term-body .c{color:var(--cyan)} .term-body .m{color:var(--magenta)}
+.term-body .p{color:var(--purple)} .term-body .a{color:var(--amber)} .term-body .w{color:var(--text)}
+
+/* ── skills constellations ────────────────────────────────── */
+.skill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.constellation{
+  border:1px solid var(--line);background:rgba(10,1,24,.72);backdrop-filter:blur(8px);
+  padding:24px;position:relative;transition:border-color .3s, box-shadow .3s, transform .3s;
+}
+.constellation:hover{border-color:var(--sk-c,var(--cyan));box-shadow:0 0 34px color-mix(in srgb,var(--sk-c,var(--cyan)) 22%,transparent);transform:translateY(-4px)}
+.constellation h3{
+  font-family:var(--font-display);font-weight:400;font-size:14px;letter-spacing:.1em;
+  color:var(--sk-c,var(--cyan));margin-bottom:6px;
+}
+.constellation .chain{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);margin-bottom:16px}
+.constellation .chain b{color:var(--sk-c,var(--cyan));font-weight:400}
+.orbits{display:flex;flex-wrap:wrap;gap:8px}
+.orbit-chip{
+  font-family:var(--font-mono);font-size:12px;padding:6px 12px;
+  border:1px solid rgba(157,149,201,.28);color:var(--text);
+  background:rgba(2,0,20,.6);transition:all .25s;
+}
+.orbit-chip:hover{border-color:var(--sk-c,var(--cyan));color:var(--sk-c,var(--cyan));box-shadow:0 0 14px color-mix(in srgb,var(--sk-c,var(--cyan)) 30%,transparent)}
+
+/* ── projects ─────────────────────────────────────────────── */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
+.mission{
+  border:1px solid var(--line);background:rgba(10,1,24,.78);backdrop-filter:blur(8px);
+  padding:26px;position:relative;display:flex;flex-direction:column;gap:14px;
+  transition:transform .3s, box-shadow .3s, border-color .3s;
+}
+.mission:hover{transform:translateY(-6px);border-color:var(--pj-c,var(--cyan));box-shadow:0 14px 44px rgba(0,0,0,.5),0 0 30px color-mix(in srgb,var(--pj-c,var(--cyan)) 18%,transparent)}
+.mission .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.mission .id{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.22em;color:var(--muted)}
+.mission h3{font-family:var(--font-display);font-weight:400;font-size:15px;letter-spacing:.06em;color:var(--pj-c,var(--cyan))}
+.mission p{font-size:14px;color:var(--muted);flex:1}
+.badge{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  padding:5px 10px;border:1px solid var(--pj-c,var(--cyan));color:var(--pj-c,var(--cyan));white-space:nowrap;
+}
+.tags{display:flex;flex-wrap:wrap;gap:7px}
+.tags span{font-family:var(--font-mono);font-size:11px;padding:4px 10px;background:rgba(2,0,20,.65);border:1px solid rgba(157,149,201,.22);color:var(--muted)}
+/* placeholder / launching-soon slots */
+.mission.slot{
+  border-style:dashed;border-color:rgba(255,182,39,.4);
+  background:repeating-linear-gradient(-45deg,rgba(10,1,24,.8) 0 14px,rgba(16,2,38,.8) 14px 28px);
+  align-items:flex-start;
+}
+.mission.slot h3{color:var(--amber)}
+.mission.slot .pulse{
+  width:9px;height:9px;border-radius:50%;background:var(--amber);display:inline-block;margin-right:8px;
+  animation:pulse 1.6s ease infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,182,39,.5)}50%{box-shadow:0 0 0 9px rgba(255,182,39,0)}}
+
+/* ── timeline ─────────────────────────────────────────────── */
+.timeline{position:relative;padding-left:34px}
+.timeline::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:1px;
+  background:linear-gradient(var(--cyan),var(--purple),var(--magenta))}
+.tl-item{position:relative;padding:0 0 34px 22px}
+.tl-item::before{
+  content:"";position:absolute;left:-31px;top:6px;width:13px;height:13px;border-radius:50%;
+  background:var(--void);border:2px solid var(--tl-c,var(--cyan));
+  box-shadow:0 0 14px color-mix(in srgb,var(--tl-c,var(--cyan)) 60%,transparent);
+}
+.tl-item .yr{font-family:var(--font-mono);font-size:12px;letter-spacing:.2em;color:var(--tl-c,var(--cyan))}
+.tl-item .yr .st{margin-left:10px;font-size:10px;padding:3px 8px;border:1px solid var(--tl-c,var(--cyan));text-transform:uppercase}
+.tl-item h3{font-family:var(--font-body);font-weight:600;font-size:16px;margin-top:6px}
+.tl-item p{font-size:13.5px;color:var(--muted);margin-top:4px}
+
+/* ── contact / footer ─────────────────────────────────────── */
+#contact{text-align:center}
+.socials{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:34px}
+.socials a{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  padding:12px 20px;border:1px solid var(--line);color:var(--muted);transition:all .25s;
+}
+.socials a:hover,.socials a:focus-visible{border-color:var(--so-c,var(--cyan));color:var(--so-c,var(--cyan));box-shadow:0 0 22px color-mix(in srgb,var(--so-c,var(--cyan)) 30%,transparent)}
+footer{
+  position:relative;z-index:2;text-align:center;
+  padding:34px 20px;border-top:1px solid var(--line);
+  font-family:var(--font-mono);font-size:11.5px;color:var(--muted);letter-spacing:.14em;
+}
+footer .z{color:var(--cyan)}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div id="boot" aria-hidden="true">
+  <div class="sig">ESHU91 // INITIALIZING ORBIT</div>
+  <div class="bar"><i></i></div>
+</div>
+
+<canvas id="cosmos" aria-hidden="true"></canvas>
+<div class="veil"></div>
+
+<nav>
+  <div class="logo"><b>⚡</b> ISHWARI<b>.</b>RAUT</div>
+  <div class="nav-links">
+    <a href="#hero">Home</a>
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Missions</a>
+    <a href="#journey">Journey</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<main>
+  <!-- ════════ HERO ════════ -->
+  <section id="hero">
+    <div class="hero-tag">CLOUD EXPLORER · FLUTTER BUILDER · AI AUTOMATION ARCHITECT</div>
+    <h1><span class="n1">ISHWARI</span><br/><span class="n2">RAUT</span></h1>
+    <div class="hero-roles"><span id="typed"></span><span class="cursor">▌</span></div>
+    <div class="hero-cta">
+      <a class="btn" href="#projects">View Missions</a>
+      <a class="btn alt" href="#contact">Open Comms</a>
+    </div>
+    <div class="scroll-hint"><i></i> SCROLL TO EXPLORE THE VOID</div>
+  </section>
+
+  <!-- ════════ MISSION CONTROL ════════ -->
+  <section id="about">
+    <div class="eyebrow reveal">Mission Control</div>
+    <h2 class="reveal">SYSTEM <span class="glow">STATUS</span></h2>
+    <div class="stat-grid reveal" id="stat-grid"></div>
+    <div style="height:34px"></div>
+    <div class="terminal reveal">
+      <div class="term-bar"><span class="r"></span><span class="y"></span><span class="g"></span><div class="t">~/ishwari — profile.py</div></div>
+      <div class="term-body"><span class="m">class</span> <span class="c">IshwariRaut</span>:
+    <span class="m">def</span> <span class="a">__init__</span>(<span class="p">self</span>):
+        <span class="p">self</span>.location  = <span class="c">"Itahari, Nepal 🇳🇵"</span>
+        <span class="p">self</span>.education = <span class="c">"BCA — Vishwa Adarsha College (2024)"</span>
+        <span class="p">self</span>.languages = [<span class="c">"नेपाली"</span>, <span class="c">"English"</span>, <span class="c">"हिन्दी"</span>, <span class="c">"Deutsch 📖"</span>]
+        <span class="p">self</span>.roles = [
+            <span class="c">"☁️  Cloud Computing Intern → Everest IT"</span>,
+            <span class="c">"👩‍🏫 CS Teacher (Part-Time) → Everest IT"</span>,
+            <span class="c">"📱 ex-Flutter Developer   → Quality IT Solutions"</span>,
+        ]
+
+    <span class="m">def</span> <span class="a">fun_fact</span>(<span class="p">self</span>):
+        <span class="m">return</span> (<span class="c">"I automate real things with Google Sheets"</span>
+                <span class="c">" before writing a single line of code ⚡"</span>)</div>
+    </div>
+  </section>
+
+  <!-- ════════ SKILLS ════════ -->
+  <section id="skills">
+    <div class="eyebrow reveal">Star Charts</div>
+    <h2 class="reveal">SKILL <span class="glow">CONSTELLATIONS</span></h2>
+    <div class="skill-grid" id="skill-grid"></div>
+  </section>
+
+  <!-- ════════ PROJECTS ════════ -->
+  <section id="projects">
+    <div class="eyebrow reveal">Flight Log</div>
+    <h2 class="reveal">MISSIONS <span class="glow">LAUNCHED</span></h2>
+    <div class="proj-grid" id="proj-grid"></div>
+  </section>
+
+  <!-- ════════ JOURNEY ════════ -->
+  <section id="journey">
+    <div class="eyebrow reveal">Trajectory</div>
+    <h2 class="reveal">FLIGHT <span class="glow">PATH</span></h2>
+    <div class="timeline" id="timeline"></div>
+  </section>
+
+  <!-- ════════ CONTACT ════════ -->
+  <section id="contact">
+    <div class="eyebrow reveal" style="text-align:center">Open Channel</div>
+    <h2 class="reveal">TRANSMIT A <span class="glow">SIGNAL</span></h2>
+    <p class="reveal" style="color:var(--muted);max-width:520px;margin:0 auto">
+      Open to cloud roles, Flutter collaborations, and AI automation projects.
+      Signals answered from Itahari, Nepal 🇳🇵 — usually within one orbit.
+    </p>
+    <div class="socials reveal" id="socials"></div>
+  </section>
+</main>
+
+<footer>
+  MADE WITH <span class="z">⚡</span> FROM NEPAL 🇳🇵 &nbsp;·&nbsp; "CODE IS THE NEW ELECTRICITY. AUTOMATION IS THE NEW MAGIC."
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   ✦ SITE_DATA — EDIT THIS OBJECT ONLY TO UPGRADE THE SITE ✦
+   ─────────────────────────────────────────────────────────────
+   HOW TO ADD A NEW SKILL GROUP : push an object into skills[]
+   HOW TO ADD A NEW PROJECT     : push an object into projects[]
+   HOW TO FILL A PLACEHOLDER    : move it from upcoming[] → projects[]
+   HOW TO EXTEND THE TIMELINE   : push an object into timeline[]
+   Colors: use "cyan" | "magenta" | "purple" | "amber"
+   ═══════════════════════════════════════════════════════════════ */
+const COLORS = {cyan:"#00FFF7", magenta:"#FF10F0", purple:"#B026FF", amber:"#FFB627"};
+
+const SITE_DATA = {
+  typedRoles: [
+    "☁️ Cloud Computing Intern @ Everest IT",
+    "📱 Flutter & Dart Developer",
+    "👩‍🏫 Teaching Python & Problem Solving",
+    "🤖 Building AI-powered workflows",
+    "📊 Google Sheets automation engineer",
+    "🛰️ Studying AZ-900 → AZ-104",
+  ],
+
+  stats: [
+    {k:"Home Planet",     v:"Nepal 🇳🇵",        d:"Based in Itahari",                 c:"cyan"},
+    {k:"Current Mission", v:"Azure AZ-900",     d:"Cloud fundamentals in progress",    c:"magenta"},
+    {k:"Next Stop",       v:"AZ-104",           d:"Azure Administrator Associate",     c:"purple"},
+    {k:"Active Builds",   v:"Full-Stack + AI",  d:"Multiple apps currently in orbit",  c:"amber"},
+  ],
+
+  skills: [
+    {name:"CLOUD & INFRASTRUCTURE", c:"cyan",
+     chain:"Azure → Windows Server → Virtualization",
+     items:["Microsoft Azure","Windows Server","VirtualBox","Linux","Virtual Machines"]},
+    {name:"MOBILE — FLUTTER / DART", c:"magenta",
+     chain:"Dart → Flutter → Android → Firebase",
+     items:["Dart","Flutter","Android Studio","Firebase"]},
+    {name:"LANGUAGES & BACKEND", c:"purple",
+     chain:"Python · PHP → Laravel · C# → .NET · Java · C",
+     items:["Python","PHP","Laravel","Java","C# / .NET","C / Arduino"]},
+    {name:"NETWORKING & ENTERPRISE IT", c:"cyan",
+     chain:"Hands-on enterprise infrastructure",
+     items:["Cisco Routers","Active Directory","DNS & DHCP","Exchange Server","VoIP","IP Addressing"]},
+    {name:"SPREADSHEET AUTOMATION", c:"amber",
+     chain:"Production systems, not formulas",
+     items:["Google Sheets","Apps Script","Excel","Airtable","n8n"]},
+    {name:"AI TOOLS & LLM WORKFLOWS", c:"magenta",
+     chain:"Prompting → pipelines → products",
+     items:["Claude","ChatGPT","Gemini","Grok","OpenRouter","ElevenLabs"]},
+  ],
+
+  projects: [
+    {id:"MSN-001", name:"STUDENT MANAGEMENT SYSTEM", c:"cyan", status:"DEPLOYED",
+     desc:"Full student registration, attendance tracking and monthly reporting — built entirely in Google Sheets for Everest IT. Fully automated, zero manual entry.",
+     tags:["Google Sheets","Apps Script","Automation"]},
+    {id:"MSN-002", name:"PERSONAL EXPENSE TRACKER", c:"magenta", status:"DEPLOYED",
+     desc:"Auto-categorised spending with monthly summaries and visual dashboards. Triggers and formulas handle everything.",
+     tags:["Google Sheets","Apps Script","Finance"]},
+    {id:"MSN-003", name:"STUDY PROGRESS TRACKER", c:"purple", status:"DEPLOYED",
+     desc:"Configurable syllabus tracker for IELTS, German A1→B2 or any subject — add topics, mark completion, track progress over time.",
+     tags:["Google Sheets","Apps Script","IELTS · German"]},
+    {id:"MSN-004", name:"E-DOKO", c:"cyan", status:"SHIPPED",
+     desc:"E-commerce app for the Nepali community — product recommendations, user management and optimised UI/UX. Built at Quality IT Solutions.",
+     tags:["Flutter","Dart","Firebase"]},
+    {id:"MSN-005", name:"ENTERPRISE IT LAB", c:"amber", status:"OPERATIONAL",
+     desc:"Windows Server environment with Active Directory, DNS/DHCP, Exchange, Cisco router configuration and a full VoIP setup.",
+     tags:["Azure","Windows Server","Cisco","VoIP"]},
+  ],
+
+  /* ✦ PLACEHOLDER SLOTS — currently building. Fill these in as
+     each full-stack / AI project ships, or add more slots. */
+  upcoming: [
+    {id:"MSN-006", name:"FULL-STACK APPLICATION", eta:"IN ORBIT — 2026",
+     desc:"A full-stack web application is currently under construction in a private repo. Mission details declassified on launch.",
+     tags:["Full-Stack","Web App","Coming Soon"]},
+    {id:"MSN-007", name:"AI PROJECT — CLASSIFIED", eta:"IN ORBIT — 2026",
+     desc:"An AI-powered build using LLM workflows and automation pipelines. Countdown has started.",
+     tags:["AI","LLM Workflows","Coming Soon"]},
+    {id:"MSN-008", name:"RESERVED LAUNCH PAD", eta:"AWAITING PAYLOAD",
+     desc:"This launch pad is reserved for the next mission. New skills and projects dock here as they're completed.",
+     tags:["Your Next Project"]},
+  ],
+
+  timeline: [
+    {yr:"2018", c:"cyan",    st:"done", title:"+2 Computer Science",           d:"Vishwa Adarsha College"},
+    {yr:"2023", c:"magenta", st:"done", title:"Flutter Developer Intern",      d:"e-Doko @ Quality IT Solutions"},
+    {yr:"2024", c:"purple",  st:"done", title:"BCA Graduate",                  d:"Vishwa Adarsha College"},
+    {yr:"2025", c:"cyan",    st:"done", title:"Cloud Intern + CS Teacher",     d:"Everest IT — teaching Python & problem solving"},
+    {yr:"2025", c:"amber",   st:"done", title:"SMS · Expense · Study Tracker", d:"Shipped with Google Sheets + Apps Script"},
+    {yr:"2026", c:"cyan",    st:"now",  title:"Azure Fundamentals (AZ-900)",   d:"Cloud certification in progress"},
+    {yr:"2026", c:"magenta", st:"next", title:"Azure Administrator (AZ-104)",  d:"Next certification target"},
+    {yr:"2026", c:"purple",  st:"next", title:"Claude Certified Architect",    d:"LLM prompting & AI workflow mastery"},
+  ],
+
+  socials: [
+    {name:"LinkedIn",  c:"cyan",    url:"https://www.linkedin.com/in/ishwari-raut-a59721199/"},
+    {name:"GitHub",    c:"purple",  url:"https://github.com/eshu91"},
+    {name:"Email",     c:"magenta", url:"mailto:ishwariraut133@gmail.com"},
+    {name:"Twitter/X", c:"amber",   url:"#"},
+  ],
+};
+
+/* ═══════════ RENDERERS (no edits needed below) ═══════════ */
+const $ = s => document.querySelector(s);
+
+$("#stat-grid").innerHTML = SITE_DATA.stats.map(s=>`
+  <div class="stat" style="--stat-c:${COLORS[s.c]}">
+    <div class="k">${s.k}</div><div class="v">${s.v}</div><div class="d">${s.d}</div>
+  </div>`).join("");
+
+$("#skill-grid").innerHTML = SITE_DATA.skills.map(g=>`
+  <div class="constellation reveal" style="--sk-c:${COLORS[g.c]}">
+    <h3>${g.name}</h3>
+    <div class="chain">${g.chain.replace(/→/g,"<b>→</b>")}</div>
+    <div class="orbits">${g.items.map(i=>`<span class="orbit-chip">${i}</span>`).join("")}</div>
+  </div>`).join("");
+
+$("#proj-grid").innerHTML =
+  SITE_DATA.projects.map(p=>`
+    <div class="mission reveal" style="--pj-c:${COLORS[p.c]}">
+      <div class="head"><div><div class="id">${p.id}</div><h3>${p.name}</h3></div>
+      <span class="badge">${p.status}</span></div>
+      <p>${p.desc}</p>
+      <div class="tags">${p.tags.map(t=>`<span>${t}</span>`).join("")}</div>
+    </div>`).join("")
+  + SITE_DATA.upcoming.map(p=>`
+    <div class="mission slot reveal" style="--pj-c:${COLORS.amber}">
+      <div class="head"><div><div class="id">${p.id}</div><h3><span class="pulse"></span>${p.name}</h3></div>
+      <span class="badge">${p.eta}</span></div>
+      <p>${p.desc}</p>
+      <div class="tags">${p.tags.map(t=>`<span>${t}</span>`).join("")}</div>
+    </div>`).join("");
+
+$("#timeline").innerHTML = SITE_DATA.timeline.map(t=>`
+  <div class="tl-item reveal" style="--tl-c:${COLORS[t.c]}">
+    <div class="yr">⟪ ${t.yr} ⟫ <span class="st">${t.st==="done"?"✓ complete":t.st==="now"?"⟳ active now":"◈ target"}</span></div>
+    <h3>${t.title}</h3><p>${t.d}</p>
+  </div>`).join("");
+
+$("#socials").innerHTML = SITE_DATA.socials.map(s=>`
+  <a href="${s.url}" target="_blank" rel="noreferrer" style="--so-c:${COLORS[s.c]}">${s.name}</a>`).join("");
+
+/* ═══════════ typing effect ═══════════ */
+(function(){
+  const el = $("#typed"), roles = SITE_DATA.typedRoles;
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(reduced){ el.textContent = roles[0]; return; }
+  let r=0,i=0,del=false;
+  (function tick(){
+    const s = roles[r];
+    el.textContent = s.slice(0, i);
+    if(!del && i < s.length){ i++; setTimeout(tick, 42); }
+    else if(!del){ del=true; setTimeout(tick, 2000); }
+    else if(i > 0){ i--; setTimeout(tick, 18); }
+    else { del=false; r=(r+1)%roles.length; setTimeout(tick, 350); }
+  })();
+})();
+
+/* ═══════════ scroll reveal ═══════════ */
+const io = new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
+}),{threshold:.12});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+
+/* ═══════════════════════════════════════════════════════════════
+   THREE.JS — THE VOID  (starfield · nebula planet · rings · comets)
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+  const canvas = $("#cosmos");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, .1, 400);
+  camera.position.set(0, 0, 34);
+
+  /* ── star field (3 depth layers, palette-tinted) ── */
+  function starLayer(count, spread, size, color, opacity){
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(count*3);
+    for(let i=0;i<count*3;i++) pos[i] = (Math.random()-.5)*spread;
+    geo.setAttribute("position", new THREE.BufferAttribute(pos,3));
+    const mat = new THREE.PointsMaterial({color, size, transparent:true, opacity, sizeAttenuation:true});
+    const pts = new THREE.Points(geo, mat);
+    scene.add(pts); return pts;
+  }
+  const stars = [
+    starLayer(1600, 260, .35, 0xffffff, .85),
+    starLayer(700,  220, .55, 0x00fff7, .55),
+    starLayer(500,  200, .6,  0xb026ff, .45),
+    starLayer(260,  190, .7,  0xff10f0, .35),
+  ];
+
+  /* ── nebula planet ── */
+  const planet = new THREE.Group();
+  const core = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(6, 1),
+    new THREE.MeshBasicMaterial({color:0x0a0128, transparent:true, opacity:.92})
+  );
+  const wire = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(6.05, 1),
+    new THREE.MeshBasicMaterial({color:0x00fff7, wireframe:true, transparent:true, opacity:.5})
+  );
+  const glow = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(6.9, 1),
+    new THREE.MeshBasicMaterial({color:0xb026ff, wireframe:true, transparent:true, opacity:.10})
+  );
+  planet.add(core, wire, glow);
+
+  /* rings */
+  function ring(radius, color, opacity, tilt){
+    const r = new THREE.Mesh(
+      new THREE.TorusGeometry(radius, .045, 8, 140),
+      new THREE.MeshBasicMaterial({color, transparent:true, opacity})
+    );
+    r.rotation.x = Math.PI/2 + tilt;
+    return r;
+  }
+  const ring1 = ring(9.4,  0xff10f0, .55, .32);
+  const ring2 = ring(11.2, 0x00fff7, .35, .32);
+  const ring3 = ring(13.1, 0xffb627, .18, .32);
+  planet.add(ring1, ring2, ring3);
+
+  /* orbiting moons on the rings */
+  function moon(color, size){ return new THREE.Mesh(
+    new THREE.SphereGeometry(size, 12, 12),
+    new THREE.MeshBasicMaterial({color})); }
+  const m1 = moon(0xff10f0, .34), m2 = moon(0x00fff7, .26), m3 = moon(0xffb627, .22);
+  planet.add(m1, m2, m3);
+
+  planet.position.set(13, 2, -6);
+  planet.rotation.z = .1;
+  scene.add(planet);
+
+  /* ── shooting comets ── */
+  const comets = [];
+  function spawnComet(){
+    const geo = new THREE.BufferGeometry();
+    const n = 26, pos = new Float32Array(n*3);
+    geo.setAttribute("position", new THREE.BufferAttribute(pos,3));
+    const mat = new THREE.PointsMaterial({color: Math.random()<.5?0x00fff7:0xff10f0,
+      size:.5, transparent:true, opacity:.9, sizeAttenuation:true});
+    const c = new THREE.Points(geo, mat);
+    c.userData = {
+      p: new THREE.Vector3((Math.random()-.5)*160, 50+Math.random()*20, -30-Math.random()*40),
+      v: new THREE.Vector3(-(.4+Math.random()*.5), -(.6+Math.random()*.5), 0),
+      life: 0, trail: []
+    };
+    scene.add(c); comets.push(c);
+  }
+
+  /* ── interaction ── */
+  let mx=0, my=0;
+  addEventListener("pointermove", e=>{
+    mx = (e.clientX/innerWidth - .5);
+    my = (e.clientY/innerHeight - .5);
+  }, {passive:true});
+  let scrollY = 0;
+  addEventListener("scroll", ()=>{ scrollY = window.scrollY; }, {passive:true});
+
+  addEventListener("resize", ()=>{
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+  renderer.setSize(innerWidth, innerHeight);
+
+  /* responsive: pull planet toward centre on small screens */
+  function layout(){
+    if(innerWidth < 720){ planet.position.set(0, 9, -18); }
+    else { planet.position.set(13, 2, -6); }
+  }
+  layout(); addEventListener("resize", layout);
+
+  let t = 0, lastComet = 0;
+  function frame(now){
+    requestAnimationFrame(frame);
+    if(reduced){ renderer.render(scene, camera); return; }
+    t += .008;
+
+    stars[0].rotation.y = t*.012;
+    stars[1].rotation.y = -t*.02;
+    stars[2].rotation.x = t*.015;
+    stars[3].rotation.y = t*.025;
+
+    planet.rotation.y += .0022;
+    wire.rotation.y   -= .0012;
+    glow.rotation.x   += .0008;
+    ring1.rotation.z += .003; ring2.rotation.z -= .002; ring3.rotation.z += .0012;
+
+    m1.position.set(Math.cos(t*1.4)*9.4,  Math.sin(t*1.4)*9.4*.32,  Math.sin(t*1.4)*3);
+    m2.position.set(Math.cos(-t*1.05)*11.2, Math.sin(-t*1.05)*11.2*.32, Math.sin(-t*1.05)*3.4);
+    m3.position.set(Math.cos(t*.7)*13.1, Math.sin(t*.7)*13.1*.32, Math.sin(t*.7)*3.8);
+
+    /* parallax: mouse + scroll */
+    camera.position.x += ((mx*4) - camera.position.x)*.04;
+    camera.position.y += ((-my*3 - scrollY*.004) - camera.position.y)*.04;
+    camera.lookAt(4, 0, -4);
+
+    /* comets */
+    if(now - lastComet > 4200 && comets.length < 3){ spawnComet(); lastComet = now; }
+    for(let i=comets.length-1;i>=0;i--){
+      const c = comets[i], u = c.userData;
+      u.p.add(u.v); u.life++;
+      u.trail.unshift(u.p.clone());
+      if(u.trail.length > 26) u.trail.pop();
+      const arr = c.geometry.attributes.position.array;
+      for(let j=0;j<26;j++){
+        const p = u.trail[Math.min(j, u.trail.length-1)];
+        arr[j*3]=p.x; arr[j*3+1]=p.y; arr[j*3+2]=p.z;
+      }
+      c.geometry.attributes.position.needsUpdate = true;
+      c.material.opacity = Math.max(0, .9 - u.life*.006);
+      if(u.life > 220){ scene.remove(c); comets.splice(i,1); }
+    }
+    renderer.render(scene, camera);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* boot out */
+addEventListener("load", ()=> setTimeout(()=> $("#boot").classList.add("done"), 1500));
+setTimeout(()=> $("#boot").classList.add("done"), 3200); /* failsafe */
+</script>
+</body>
+</html>
